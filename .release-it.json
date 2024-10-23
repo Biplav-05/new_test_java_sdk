@@ -9,7 +9,7 @@
     "contributors": true
   },
   "hooks": {
-    "before:bump": [
+    "after:bump": [
       "chmod +x ./script/update_version.sh",
       "./script/update_version.sh pom.xml ${version}"
     ],
