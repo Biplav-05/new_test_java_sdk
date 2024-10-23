@@ -52,21 +52,23 @@ jobs:
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
-      # Set up the GPG key for signing
+        # Set up the GPG key for signing
       - name: Set up GPG key
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+            GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+            PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+            GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}  # Use the secret here
         run: |
-          # Create the GPG directory with secure permissions
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          
-          # Import the private key
-          echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
+            # Create the GPG directory with secure permissions
+            mkdir -p ~/.gnupg
+            chmod 700 ~/.gnupg
+            
+            # Import the private key
+            echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
 
-          # Trust the GPG key (replace <actual_key_id> with your actual key ID)
-          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key <actual_key_id> trust quit
+            # Trust the GPG key using the secret key ID
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key "$GPG_KEY_ID" trust quit
+
 
       # Run release-it for publishing
       - name: Run release-it
