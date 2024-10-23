@@ -1,5 +1,12 @@
 
 
+## 2.0.5-beta.0 (2024-10-23)
+
+
+### Bug Fixes
+
+* abc ([3f1b413](https://github.com/Biplav-05/new_test_java_sdk/commit/3f1b4134b60449d7c1be927e58d4e1086f37c229))
+
 ## 2.0.5-alpha.0 (2024-10-23)
 
 ## [2.0.4](https://github.com/Biplav-05/new_test_java_sdk/compare/V2.0.3...V2.0.4) (2024-10-23)
