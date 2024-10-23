@@ -15,7 +15,7 @@ jobs:
       RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
     steps:
-      # Validate the branch
+      # Check if the workflow is running on the main branch
       - name: Validate branch
         run: |
           if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
@@ -31,11 +31,11 @@ jobs:
             exit 1
           fi
 
-      # Checkout source code
+      # Checkout the code from the repository
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      # Setup Java
+      # Setup Java environment
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -46,22 +46,28 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-      # Set Git user
+      # Configure Git user information
       - name: Set Git user
         run: |
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
-      # Set up GPG key
+      # Set up the GPG key for signing
       - name: Set up GPG key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
+          # Create the GPG directory
+          mkdir -p ~/.gnupg
+          
+          # Import the private key
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
-          echo "$PASSPHRASE" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --edit-key YOUR_GPG_KEY_ID trust quit
 
-      # Run release-it
+          # Trust the GPG key (replace YOUR_GPG_KEY_ID with your actual key ID)
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key YOUR_GPG_KEY_ID trust quit
+
+      # Run release-it for publishing
       - name: Run release-it
         run: |
           if [ "$RELEASE_TYPE" == "regular" ]; then
@@ -74,12 +80,12 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
-      # Print success message if release-it completes successfully
+      # Print a success message if the release was successful
       - name: Print success message
         if: success()
         run: echo "Release and publishing completed successfully!"
 
-      # Handle failure
+      # Print a failure message if the release failed
       - name: Handle failure
         if: failure()
         run: echo "Release process failed."
