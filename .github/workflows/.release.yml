@@ -51,7 +51,7 @@ jobs:
           mkdir -p ~/.m2
           echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" \
                   xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" \
-                  xsi:schemaLocation=\"http://www.mavensite.org/xsd/settings-1.0.0.xsd\"> \
+                  xsi:schemaLocation=\"http://maven.apache.org/xsd/settings-1.0.0.xsd\"> \
                 <servers> \
                   <server> \
                     <id>central</id> \
@@ -83,6 +83,9 @@ jobs:
           chmod 700 ~/.gnupg
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
           echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
+
+      - name: Automate GPG trust
+        run: echo -e "5\n" | gpg --command-fd 0 --batch --yes --edit-key ${{ secrets.GPG_KEY_ID }} trust
 
       - name: Run release-it
         run: |
