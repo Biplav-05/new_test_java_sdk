@@ -1,5 +1,7 @@
 
 
+## 2.1.1 (2024-10-23)
+
 ## [2.1.1-beta.0](https://github.com/Biplav-05/new_test_java_sdk/compare/V2.1.0...V2.1.1-beta.0) (2024-10-23)
 
 # 2.1.0 (2024-10-23)
