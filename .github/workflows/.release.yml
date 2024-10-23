@@ -35,16 +35,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      # Install Maven
-      - name: Setup Maven
-        run: |
-          wget https://downloads.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip
-          unzip apache-maven-3.8.7-bin.zip
-          sudo mv apache-maven-3.8.7 /opt/maven
-          echo "MAVEN_HOME=/opt/maven" | sudo tee -a /etc/environment
-          echo "export PATH=\$PATH:\$MAVEN_HOME/bin" | sudo tee -a /etc/environment
-          source /etc/environment
-
       # Setup Java environment
       - name: Setup Java
         uses: actions/setup-java@v3
