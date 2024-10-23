@@ -67,7 +67,8 @@ jobs:
             echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
 
             # Trust the GPG key using the secret key ID
-            gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key "$GPG_KEY_ID" trust quit
+            echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
+
 
 
       # Run release-it for publishing
