@@ -82,7 +82,12 @@ jobs:
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
+          echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
           echo -e "trust\n5\ny\nsave\n" | gpg --batch --command-fd 0 --edit-key ${{ secrets.GPG_KEY_ID }}
+
+      - name: Verify GPG key
+        run: |
+          gpg --list-keys ${{ secrets.GPG_KEY_ID }}
 
       - name: Run release-it
         run: |
