@@ -14,7 +14,9 @@
       "./script/update_version.sh pom.xml ${version}"
     ],
     "before:release": [
-      "mvn clean install",
+      "mvn clean install"
+    ],
+    "after:release": [
       "mvn deploy"
     ]
   },

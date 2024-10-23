@@ -42,7 +42,13 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      # Install Node.js dependencies
+      # Setup Maven environment
+      - name: Setup Maven
+        uses: actions/setup-maven@v2
+        with:
+          maven-version: '3.8.7' # Use the Maven version you want
+
+      # Install Node.js dependencies (if applicable)
       - name: Install Node.js dependencies
         run: npm ci
 
@@ -52,16 +58,16 @@ jobs:
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
-      # Create Maven settings.xml
+      # Create settings.xml for Maven
       - name: Create settings.xml
         run: |
           mkdir -p ~/.m2
-          echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\"
-                        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
-                        xsi:schemaLocation=\"http://www.mavensite.org/xsd/settings-1.0.0.xsd\">
+          echo "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'
+                xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                xsi:schemaLocation='http://mavensite.org/xsd/settings-1.0.0.xsd'>
             <servers>
               <server>
-                <id>central</id>
+                <id>ossrh</id>
                 <username>${{ secrets.SONATYPE_USERNAME }}</username>
                 <password>${{ secrets.SONATYPE_PASSWORD }}</password>
               </server>
@@ -83,34 +89,34 @@ jobs:
       # Set up the GPG key for signing
       - name: Set up GPG key
         env:
-            GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-            PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-            GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}  # Use the secret here
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}  # Use the secret here
         run: |
-            # Create the GPG directory with secure permissions
-            mkdir -p ~/.gnupg
-            chmod 700 ~/.gnupg
-            
-            # Import the private key
-            echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
+          # Create the GPG directory with secure permissions
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          
+          # Import the private key
+          echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
 
-            # Trust the GPG key using the secret key ID
-            echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
+          # Trust the GPG key using the secret key ID
+          echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
 
-      # Run release-it for publishing
-      - name: Run release-it
-        run: |
-          if [ "$RELEASE_TYPE" == "regular" ]; then
-            npx release-it
-          else
-            npx release-it --preRelease="$RELEASE_TYPE"
-          fi
+      # Run Maven to build and publish
+      - name: Run Maven deploy
+        run: mvn clean deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}  # If needed for GitHub access
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
       # Print a success message if the release was successful
       - name: Print success message
         if: success()
-        run: echo "Release and publishing completed successfull
+        run: echo "Release and publishing completed successfully!"
+
+      # Print a failure message if the release failed
+      - name: Handle failure
+        if: failure()
+        run: echo "Release process failed."
