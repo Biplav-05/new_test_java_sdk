@@ -52,7 +52,35 @@ jobs:
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
-        # Set up the GPG key for signing
+      # Create Maven settings.xml
+      - name: Create settings.xml
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\"
+                        xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
+                        xsi:schemaLocation=\"http://www.mavensite.org/xsd/settings-1.0.0.xsd\">
+            <servers>
+              <server>
+                <id>central</id>
+                <username>${{ secrets.SONATYPE_USERNAME }}</username>
+                <password>${{ secrets.SONATYPE_PASSWORD }}</password>
+              </server>
+            </servers>
+            <profiles>
+              <profile>
+                <id>central</id>
+                <activation>
+                  <activeByDefault>true</activeByDefault>
+                </activation>
+                <properties>
+                  <gpg.executable>gpg</gpg.executable>
+                  <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
+                </properties>
+              </profile>
+            </profiles>
+          </settings>" > ~/.m2/settings.xml
+
+      # Set up the GPG key for signing
       - name: Set up GPG key
         env:
             GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
@@ -68,8 +96,6 @@ jobs:
 
             # Trust the GPG key using the secret key ID
             echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
-
-
 
       # Run release-it for publishing
       - name: Run release-it
@@ -87,9 +113,4 @@ jobs:
       # Print a success message if the release was successful
       - name: Print success message
         if: success()
-        run: echo "Release and publishing completed successfully!"
-
-      # Print a failure message if the release failed
-      - name: Handle failure
-        if: failure()
-        run: echo "Release process failed."
+        run: echo "Release and publishing completed successfull
