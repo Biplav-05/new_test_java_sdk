@@ -58,14 +58,15 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          # Create the GPG directory
+          # Create the GPG directory with secure permissions
           mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
           
           # Import the private key
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
 
-          # Trust the GPG key (replace YOUR_GPG_KEY_ID with your actual key ID)
-          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key YOUR_GPG_KEY_ID trust quit
+          # Trust the GPG key (replace <actual_key_id> with your actual key ID)
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --edit-key <actual_key_id> trust quit
 
       # Run release-it for publishing
       - name: Run release-it
