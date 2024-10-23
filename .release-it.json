@@ -13,10 +13,8 @@
       "chmod +x ./script/update_version.sh",
       "./script/update_version.sh pom.xml ${version}"
     ],
-    "before:release": [
-      "mvn clean install"
-    ],
     "after:release": [
+      "mvn clean install",
       "mvn deploy"
     ]
   },
