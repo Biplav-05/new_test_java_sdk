@@ -97,7 +97,7 @@ jobs:
             npx release-it --preRelease="$RELEASE_TYPE"
           fi
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
