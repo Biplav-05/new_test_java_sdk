@@ -11,6 +11,7 @@ if [ -z "$xml_file" ] || [ -z "$new_version" ]; then
 fi
 
 # Update the version in the pom.xml file
-sed -i "s/<version>.*<\/version>/<version>${new_version}<\/version>/" $xml_file
+# Use sed to update only the first occurrence of the <version> tag under <project>
+sed -i '0,/<version>.*<\/version>/s//<version>'"$new_version"'<\/version>/' 
 
 echo "Updated version to $new_version in $xml_file"
