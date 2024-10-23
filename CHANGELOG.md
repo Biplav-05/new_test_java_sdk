@@ -1,5 +1,12 @@
 
 
+# 2.1.0 (2024-10-23)
+
+
+### Features
+
+* abcd ([12e5d78](https://github.com/Biplav-05/new_test_java_sdk/commit/12e5d78739f8d55463ff3ca2d33ce711098a944b))
+
 ## 2.0.5-beta.0 (2024-10-23)
 
 
