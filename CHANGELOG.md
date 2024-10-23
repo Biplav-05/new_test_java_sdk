@@ -1,5 +1,12 @@
 
 
+## 2.0.2 (2024-10-23)
+
+
+### Bug Fixes
+
+* adfhadsklf ([dc83cc9](https://github.com/Biplav-05/new_test_java_sdk/commit/dc83cc9ab9d37a98ef42ac1f64086c5173dce249))
+
 ## 2.0.1 (2024-10-23)
 
 
