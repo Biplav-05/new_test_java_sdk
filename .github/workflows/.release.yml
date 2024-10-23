@@ -35,6 +35,16 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      # Install Maven
+      - name: Setup Maven
+        run: |
+          wget https://downloads.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip
+          unzip apache-maven-3.8.7-bin.zip
+          sudo mv apache-maven-3.8.7 /opt/maven
+          echo "MAVEN_HOME=/opt/maven" | sudo tee -a /etc/environment
+          echo "export PATH=\$PATH:\$MAVEN_HOME/bin" | sudo tee -a /etc/environment
+          source /etc/environment
+
       # Setup Java environment
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -42,13 +52,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      # Setup Maven environment
-      - name: Setup Maven
-        uses: actions/setup-maven@v2
-        with:
-          maven-version: '3.8.7' # Use the Maven version you want
-
-      # Install Node.js dependencies (if applicable)
+      # Install Node.js dependencies
       - name: Install Node.js dependencies
         run: npm ci
 
@@ -57,34 +61,6 @@ jobs:
         run: |
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-
-      # Create settings.xml for Maven
-      - name: Create settings.xml
-        run: |
-          mkdir -p ~/.m2
-          echo "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'
-                xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-                xsi:schemaLocation='http://mavensite.org/xsd/settings-1.0.0.xsd'>
-            <servers>
-              <server>
-                <id>ossrh</id>
-                <username>${{ secrets.SONATYPE_USERNAME }}</username>
-                <password>${{ secrets.SONATYPE_PASSWORD }}</password>
-              </server>
-            </servers>
-            <profiles>
-              <profile>
-                <id>central</id>
-                <activation>
-                  <activeByDefault>true</activeByDefault>
-                </activation>
-                <properties>
-                  <gpg.executable>gpg</gpg.executable>
-                  <gpg.passphrase>${{ secrets.GPG_PASSPHRASE }}</gpg.passphrase>
-                </properties>
-              </profile>
-            </profiles>
-          </settings>" > ~/.m2/settings.xml
 
       # Set up the GPG key for signing
       - name: Set up GPG key
@@ -103,11 +79,11 @@ jobs:
           # Trust the GPG key using the secret key ID
           echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
 
-      # Run Maven to build and publish
+      # Run Maven deploy for publishing
       - name: Run Maven deploy
-        run: mvn clean deploy -DskipTests
+        run: mvn deploy --settings .mvn/settings.xml
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}  # If needed for GitHub access
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
