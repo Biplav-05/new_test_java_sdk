@@ -15,6 +15,7 @@ jobs:
       RELEASE_TYPE: ${{ github.event.inputs.release-type }}
 
     steps:
+      # Validate that the workflow is running on the main branch
       - name: Validate branch
         run: |
           if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
@@ -22,6 +23,7 @@ jobs:
             exit 1
           fi
 
+      # Validate the release type provided as input
       - name: Validate release type
         run: |
           if [[ "$RELEASE_TYPE" != "regular" && "$RELEASE_TYPE" != "alpha" && "$RELEASE_TYPE" != "beta" && "$RELEASE_TYPE" != "rc" ]]; then
@@ -29,45 +31,47 @@ jobs:
             exit 1
           fi
 
+      # Checkout the source code from the repository
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      # Setup Java environment
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
 
+      # Install necessary Node.js dependencies
       - name: Install Node.js dependencies
         run: npm ci
 
+      # Configure Git user with provided email and name
       - name: Set Git user
         run: |
           git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
           git config --global user.name "${{ secrets.GIT_USER_NAME }}"
 
+      # Generate Maven settings.xml file with necessary configurations
       - name: Generate Maven configuration
-        working-directory: script
         run: |
-          chmod +x generate_setting_file.sh
-          ./generate_setting_file.sh ${{ secrets.PUBLISHING_SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
+          chmod +x script/generate_config_file.sh
+          ./script/generate_config_file.sh ${{ secrets.PUBLISHING_SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
 
+      # Import the GPG key for signing artifacts
       - name: Set up GPG key
         env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}  # The private GPG key used for signing
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}       # The passphrase for the GPG key
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}           # The ID of the GPG key
         run: |
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
-          echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit
-          echo -e "trust\n5\ny\nsave\n" | gpg --batch --command-fd 0 --edit-key ${{ secrets.GPG_KEY_ID }}
-
-      - name: Verify GPG key
-        run: |
-          gpg --list-keys ${{ secrets.GPG_KEY_ID }}
-
+          mkdir -p ~/.gnupg                            # Create the .gnupg directory if it doesn't exist
+          chmod 700 ~/.gnupg                           # Set the correct permissions for the .gnupg directory
+          echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes  # Import the GPG private key
+          echo -e "5\n" | gpg --batch --yes --pinentry-mode loopback --passphrase "$PASSPHRASE" --command-fd 0 --edit-key "$GPG_KEY_ID" trust quit  # Set the trust level for the GPG key to ultimate
+          echo -e "trust\n5\ny\nsave\n" | gpg --batch --command-fd 0 --edit-key ${{ secrets.GPG_KEY_ID }}  # Ensure the key's trust level is set and saved correctly
+        
+      # Run release-it to handle version bumping, changelog generation, and deployment
       - name: Run release-it
         run: |
           if [ "$RELEASE_TYPE" == "regular" ]; then
@@ -76,14 +80,16 @@ jobs:
             npx release-it --preRelease="$RELEASE_TYPE"
           fi
         env:
-          TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 
+      # Print a success message if the release was successful
       - name: Print success message
         if: success()
         run: echo "Release and publishing completed successfully!"
 
+      # Print a failure message if the release failed
       - name: Handle failure
         if: failure()
         run: echo "Release process failed."
