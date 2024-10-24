@@ -3,14 +3,14 @@
           xsi:schemaLocation="http://www.mavensite.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
-      <id>$SERVER_ID</id>
+      <id>$PUBLISHING_SERVER_ID</id>
       <username>$SONATYPE_USERNAME</username>
       <password>$SONATYPE_PASSWORD</password>
     </server>
   </servers>
   <profiles>
     <profile>
-      <id>$SERVER_ID</id>
+      <id>$PUBLISHING_SERVER_ID</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
