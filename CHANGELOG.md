@@ -1,5 +1,12 @@
 
 
+# 2.2.0 (2024-10-24)
+
+
+### Features
+
+* again ([4f0933e](https://github.com/Biplav-05/new_test_java_sdk/commit/4f0933eb72cc1583e617904fa41f90bbcd2a812b))
+
 ## 2.1.3 (2024-10-24)
 
 ## 2.1.3-alpha.0 (2024-10-24)
