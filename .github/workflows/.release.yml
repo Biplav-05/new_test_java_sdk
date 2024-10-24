@@ -50,7 +50,7 @@ jobs:
         working-directory: script
         run: |
           chmod +x generate_setting_file.sh
-          ./generate_setting_file.sh ${{ secrets.SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
+          ./generate_setting_file.sh ${{ secrets.PUBLISHING_SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Set up GPG key
         env:

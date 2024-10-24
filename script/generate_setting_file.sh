@@ -1,12 +1,12 @@
 #!/bin/bash
 generate_settings_file() {
-  local SERVER_ID=$1
+  local PUBLISHING_SERVER_ID=$1
   local SONATYPE_USERNAME=$2
   local SONATYPE_PASSWORD=$3
   local GPG_PASSPHRASE=$4
 
-  if [ -z "$SERVER_ID" ] || [ -z "$SONATYPE_USERNAME" ] || [ -z "$SONATYPE_PASSWORD" ] || [ -z "$GPG_PASSPHRASE" ]; then
-      echo "Usage: create_settings <SERVER_NAME> <SONATYPE_USERNAME> <SONATYPE_PASSWORD> <GPG_PASSPHRASE>"
+  if [ -z "$PUBLISHING_SERVER_ID" ] || [ -z "$SONATYPE_USERNAME" ] || [ -z "$SONATYPE_PASSWORD" ] || [ -z "$GPG_PASSPHRASE" ]; then
+      echo "Usage: generate_config_file <PUBLISHING_SERVER_ID> <SONATYPE_USERNAME> <SONATYPE_PASSWORD> <GPG_PASSPHRASE>"
       return 1
   fi
 
@@ -14,7 +14,7 @@ generate_settings_file() {
   local temp_settings_file="settings.xml"
 
   # Read the template file and replace placeholders with the provided values
-  sed -e "s/\$SERVER_ID/$SERVER_ID/g" \
+  sed -e "s/\$PUBLISHING_SERVER_ID/$PUBLISHING_SERVER_ID/g" \
       -e "s/\$SONATYPE_USERNAME/$SONATYPE_USERNAME/g" \
       -e "s/\$SONATYPE_PASSWORD/$SONATYPE_PASSWORD/g" \
       -e "s/\$GPG_PASSPHRASE/$GPG_PASSPHRASE/g" \
