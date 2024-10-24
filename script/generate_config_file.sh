@@ -11,12 +11,12 @@ generate_config_file() {
       exit 1
   fi
 
-  # Check if settings.xml already exists in target directory
-  if [ -f ~/.m2/settings.xml ]; then
-      cat ~/.m2/settings.xml
-      echo "settings.xml already exists in ~/.m2 directory. Skipping..."
-      exit 0
-  fi
+#   # Check if settings.xml already exists in target directory
+#   if [ -f ~/.m2/settings.xml ]; then
+#       cat ~/.m2/settings.xml
+#       echo "settings.xml already exists in ~/.m2 directory. Skipping..."
+#       exit 0
+#   fi
 
   # Define the location to create the temporary file
   local temp_settings_file="settings.xml"
@@ -47,6 +47,7 @@ generate_config_file() {
       exit 1
   fi
 
+  cat ~/.m2/settings.xml
   echo "Configuration file moved to ~/.m2 directory."
 }
 
