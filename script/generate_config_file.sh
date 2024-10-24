@@ -13,6 +13,7 @@ generate_config_file() {
 
   # Check if settings.xml already exists in target directory
   if [ -f ~/.m2/settings.xml ]; then
+      cat ~/.m2/settings.xml
       echo "settings.xml already exists in ~/.m2 directory. Skipping..."
       exit 0
   fi
