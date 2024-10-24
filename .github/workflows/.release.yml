@@ -54,9 +54,10 @@ jobs:
 
       # Generate Maven settings.xml file with necessary configurations
       - name: Generate Maven configuration
+        working-directory: script
         run: |
-          chmod +x ./script/generate_config_file.sh
-          ./script/generate_config_file.sh ${{ secrets.PUBLISHING_SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
+          chmod +x generate_config_file.sh
+          ./generate_config_file.sh ${{ secrets.PUBLISHING_SERVER_ID }} ${{ secrets.SONATYPE_USERNAME }} ${{ secrets.SONATYPE_PASSWORD }} ${{ secrets.GPG_PASSPHRASE }}
 
       # Import the GPG key for signing artifacts
       - name: Set up GPG key
