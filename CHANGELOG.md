@@ -1,5 +1,12 @@
 
 
+## 2.3.1 (2024-10-24)
+
+
+### Bug Fixes
+
+* one ([50e6b74](https://github.com/Biplav-05/new_test_java_sdk/commit/50e6b743617736f7240e36c2baf58af8f8aa67ed))
+
 # 2.3.0 (2024-10-24)
 
 
